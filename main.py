@@ -1,3 +1,5 @@
+from time import sleep
+
 from lib.queries import FILM_QUERY, create_query
 from lib.wikidataAPI import WikiDataAPI
 from lib.csvutilities import writeCSV, readCSVtoObj
@@ -7,12 +9,19 @@ def main():
     # leggiamo il csv
     data = readCSVtoObj("data/dataset.csv", ["id", "title"])
 
+    already_fetched = readCSVtoObj("data/dataset_with_uris.csv", ["id", "title", "uri"])
+    last_fetched = already_fetched[len(already_fetched)-1]["id"]
+
+    data = data[int(last_fetched):]
+
+    #leggi da dataset with uris, trova l'ultimo id
+
     print(f'Total movies: {len(data)}')
 
     i = 1
     for movie in data:
 
-        print(f'Getting movie {i/len(data)}')
+        print(f'Getting movie {i / len(data)}')
 
         # query per recupare l'uri del film
         wikidataAPI = WikiDataAPI()
@@ -31,4 +40,10 @@ def main():
             mode='a'
         )
 
-main()
+
+while True:
+    try:
+        main()
+    except Exception as e:
+        print(e)
+        sleep(600)
