@@ -1,7 +1,10 @@
+from wsgiref import headers
+
 import requests
 import time
 
 STD_ENDPOINT = "https://query.wikidata.org/sparql"
+HEADERS = {"User-Agent": "icon-bot/1.0"}
 
 
 class WikiDataAPI:
@@ -15,10 +18,10 @@ class WikiDataAPI:
             raise Exception("Query param is mandatory")
 
         print(f'Quering {self.endpoint} at {time.ctime(time.time())}')
-        #print(f'Query: {params["query"]}')
+        # print(f'Query: {params["query"]}')
 
         start = time.time()
-        result = requests.get(self.endpoint, params)
+        result = requests.get(self.endpoint, params, headers=HEADERS)
         end = time.time()
         print(f'Elapsed: {end - start}s')
 
@@ -37,7 +40,7 @@ class WikiDataAPI:
         print(f'Quering {uri}')
 
         start = time.time()
-        result = requests.get(self.endpoint, {"format": "json"})
+        result = requests.get(self.endpoint, {"format": "json"}, headers=HEADERS)
         end = time.time()
         print(f'Elapsed: {end - start}s')
 
