@@ -4,7 +4,7 @@ WHERE{
   ?movie wdt:P31 wd:Q11424.
   ?movie rdfs:label ?title.
   ?movie wdt:P364 ?language.
-  FILTER(STRSTARTS(?title, '<1>')).
+  FILTER(STRSTARTS(?title, "<1>")).
   FILTER((LANG(?title)) = "en").
 }
 '''
