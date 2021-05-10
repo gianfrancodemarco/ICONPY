@@ -2,7 +2,6 @@ import pickle
 
 WIKI_MOVIE_PROPS = ["instance_of", "cast_member", "title", "PORT_film_ID"]
 
-
 class WikiMovie:
 
     def __init__(self, wiki_movie_response):
@@ -15,7 +14,9 @@ class WikiMovie:
 
         for prop in payload:
             prop_label = prop['propLabel']['value'].replace(" ", "_")
-            if prop_label in WIKI_MOVIE_PROPS:
+
+            if True:
+            #if prop_label in WIKI_MOVIE_PROPS:
 
                 prop_value = {"uri": prop['value']['value'], "value": prop['valueLabel']['value']}
 
@@ -34,18 +35,11 @@ class WikiMovie:
 
         return props
 
+    def set_prop(self, name, value):
+        self.props[name] = value
 
-def serialize(objects):
-    with open('data/wikimovieserialization', 'wb') as f:
-        pickle.dump(len(objects), f)
-        for obj in objects:
-            pickle.dump(obj, f)
+    def serialize(self):
+        filename = self.props["wiki_data_id"] + "_" + self.props["title"]["value"]
 
-
-def deserialize():
-    objects = []
-    with open('data/wikimovieserialization', 'rb') as f:
-        for _ in range(pickle.load(f)):
-            objects.append(pickle.load(f))
-
-    return objects
+        with open(f'data/movie_serialized/{filename}', 'wb') as f:
+            pickle.dump(self, f)
