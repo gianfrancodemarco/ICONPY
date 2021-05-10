@@ -4,4 +4,4 @@ import time
 from lib.datasetcreator import get_uris, get_entities
 from lib.wikidata.wikimovie import WikiMovie
 
-get_entities()
+get_entities(resume_id=76)

@@ -13,6 +13,11 @@ class WikiMovie:
         props = {}
 
         for prop in payload:
+
+            #skippa i valori non in inglese
+            if prop['value']['type'] == 'literal' and 'xml:lang' in prop['value'] and prop['value']['xml:lang'] != 'en':
+                continue
+
             prop_label = prop['propLabel']['value'].replace(" ", "_")
 
             if True:

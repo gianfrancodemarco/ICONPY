@@ -41,10 +41,10 @@ def __get_uris(resume_id=0):
             )
 
 
-def get_entities():
+def get_entities(resume_id=0):
     while True:
         try:
-            __get_entities()
+            __get_entities(resume_id)
         except Exception as e:
             print(e)
             sleep(600)
