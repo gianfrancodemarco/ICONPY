@@ -1,38 +1,9 @@
 from time import sleep
 
-from lib.queries import FILM_QUERY, create_query
-from lib.wikidataAPI import WikiDataAPI
+from lib.queries import FILM_QUERY, create_query, ENTITY_QUERY
+from lib.wikidata.wikidataAPI import WikiDataAPI
+from lib.wikidata.wikimovie import WikiMovie
 from lib.csvutilities import writeCSV, readCSVtoObj
-
-
-def get_uris_multithreading(last_fetched=0, fetch_size=100):
-    # query per recupare l'uri del film
-    wikidataAPI = WikiDataAPI()
-
-    dest_file = f'data/dataset_with_uris_{last_fetched}_{last_fetched + fetch_size}.csv'
-    # leggiamo il csv
-    data = readCSVtoObj("data/dataset.csv", ["id", "title"])
-
-    print(f'Total movies: {len(data)}')
-
-    i = last_fetched
-    for movie in data[last_fetched:last_fetched + fetch_size]:
-
-        print(f'Getting movie {i} / {len(data)}')
-
-        query = create_query(FILM_QUERY, [movie['title']])
-        results = wikidataAPI.do_query(query)
-
-        if results is None or len(results) == 0:
-            continue
-
-        result_movie = results[0]
-
-        writeCSV(
-            dest_file,
-            [[movie['id'], movie['title'], result_movie['movie']['value']]],
-            mode='a'
-        )
 
 
 def __get_uris(already_fetched=None):
@@ -84,3 +55,38 @@ def get_uris():
         except Exception as e:
             print(e)
             sleep(600)
+
+
+
+def get_entities():
+    while True:
+        try:
+            __get_entities()
+        except Exception as e:
+            print(e)
+            sleep(600)
+
+
+def __get_entities():
+    # leggiamo il csv
+    data = readCSVtoObj("data/dataset_with_uris.csv", ["id", "title", "uri"])
+    data = [movie['uri'] for movie in data]
+    ids = [uri.split(sep='/')[-1] for uri in data]
+
+    print(f'Total movies: {len(ids)}')
+
+    for i, id in enumerate(ids):
+
+        print(f'Getting entity {i+1} / {len(ids)}')
+
+        # query per recupare l'uri del film
+        wikidataAPI = WikiDataAPI()
+
+        query = create_query(ENTITY_QUERY, [id])
+        results = wikidataAPI.do_query(query)
+
+        wiki_movie = WikiMovie(results)
+        built = wiki_movie.build()
+
+        print(built)
+

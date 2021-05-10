@@ -9,6 +9,20 @@ WHERE{
 }
 '''
 
+ENTITY_QUERY = '''
+SELECT ?prop ?value ?propLabel ?valueLabel{
+  VALUES (?movie) {(wd:<1>)}
+
+  ?movie ?p ?statement .
+  ?statement ?ps ?value .
+  
+  ?prop wikibase:claim ?p.
+  ?prop wikibase:statementProperty ?ps.
+
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "en" }
+}
+ORDER BY ?wd ?statement ?value
+'''
 
 def create_query(query_text, values):
 
