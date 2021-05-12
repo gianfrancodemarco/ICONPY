@@ -1,11 +1,12 @@
 from time import sleep
 
 from lib.queries import FILM_QUERY, create_query, ENTITY_QUERY
+from lib.serializer import deserialize, serialize
+from lib.utils import all_files_in_path
 from lib.wikidata.wikidataAPI import WikiDataAPI
 from lib.wikidata.wikimovie import WikiMovie
 from lib.csvutilities import writeCSV, readCSVtoObj
 import webbrowser
-
 
 
 def get_uris():
@@ -18,7 +19,6 @@ def get_uris():
 
 
 def __get_uris(resume_id=0):
-
     # leggiamo il csv
     data = readCSVtoObj("data/dataset.csv", ["id", "title"])
 
@@ -28,7 +28,7 @@ def __get_uris(resume_id=0):
 
     for i, movie in data[resume_id:]:
 
-        print(f'Getting movie {i+1} / {len(data)}')
+        print(f'Getting movie {i + 1} / {len(data)}')
 
         query = create_query(FILM_QUERY, [movie['title']])
         results = wikidataAPI.do_query(query)
@@ -53,10 +53,9 @@ def get_entities(resume_id=0, ids_list=None):
 
 
 def __get_entities(resume_id=0, ids_list=None):
-
-    if ids_list is not None: #se passo una lista di id, recupero quelli
+    if ids_list is not None:  # se passo una lista di id, recupero quelli
         ids = ids_list
-    else: #altrimenti li recupero dal csv
+    else:  # altrimenti li recupero dal csv
         # leggiamo il csv
         data = readCSVtoObj("data/_old_dataset_with_uris.csv", ["id", "title", "uri"])
         data = [movie['uri'] for movie in data]
@@ -68,7 +67,7 @@ def __get_entities(resume_id=0, ids_list=None):
 
     for i, idx in enumerate(ids[resume_id:]):
 
-        print(f'Getting entity {i+resume_id+1} / {len(ids)}')
+        print(f'Getting entity {i + resume_id + 1} / {len(ids)}')
 
         query = create_query(ENTITY_QUERY, [idx])
         results = wikidataAPI.do_query(query)
@@ -86,4 +85,34 @@ def __get_entities(resume_id=0, ids_list=None):
             print(f'Error on movie: {idx}')
             print(e)
             input()
+
+
+def serialize_movies():
+    path_full = "data/serialized_movies_full/"
+    path = "data/serialized_movies/"
+    file_names = all_files_in_path(path_full)
+
+    for i, file in enumerate(file_names):
+        print(f"Deserializing: {i+1}/{len(file_names)}")
+        movie = deserialize(path_full + file)
+        movie.build()
+        serialize(movie, path + file)
+
+
+def create_kb():
+
+    path = "data/serialized_movies/"
+    movies = [deserialize(path + movie) for movie in all_files_in_path(path)]
+    lost = 0
+
+    for i, movie in enumerate(movies):
+        print(f'Writing statements for film {i}/{movie}')
+        formatted_statements = movie.get_statements()
+        try:
+            with open("data/kb/knowledge_base.kfb", "a") as file:
+                file.write("\n".join(formatted_statements))
+                file.write("\n")
+        except UnicodeEncodeError:
+            lost += 1
+            print(f"Lost film. {lost}")
 

@@ -3,11 +3,15 @@ from os.path import isfile, join
 from lib.csvutilities import readCSVtoObj
 
 
-def clean_filename(filename):
+def clean_string(filename, replacer='', extend_invalid=None):
+
     invalid = '<>:"/\|?* '
 
+    if extend_invalid is not None:
+        invalid += extend_invalid
+
     for char in invalid:
-        filename = filename.replace(char, '')
+        filename = filename.replace(char, replacer)
 
     return filename
 
@@ -17,7 +21,7 @@ def all_files_in_path(path):
 
 
 def get_skipped_movies_ids():
-    path = 'data/serialized_movies'
+    path = 'data/serialized_movies_full'
 
     fetched_movies_ids = [filename.split('_')[0] for filename in all_files_in_path(path)]
     all_movies_ids = [movie["uri"].split("/")[-1] for movie in

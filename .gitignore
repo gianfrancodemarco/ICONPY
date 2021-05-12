@@ -5,3 +5,4 @@
 .venv
 venv/
 lib/__pycache__/
+compiled_krb/
