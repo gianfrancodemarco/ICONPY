@@ -1,14 +1,14 @@
 import csv
 
 
-def writeCSV(filename, rows, headers=None, mode='w') -> None:
+def writeCSV(filename, rows, headers=None, mode='w', encoding='cp1252', newline="", delimiter=",") -> None:
     """
   Writes a csv file at {filename}
   Writes headers as the first row, then writes headers
   """
 
-    with open(filename, mode, newline='') as csvfile:
-        writer = csv.writer(csvfile, delimiter=',')
+    with open(filename, mode, newline=newline, encoding=encoding) as csvfile:
+        writer = csv.writer(csvfile, delimiter=delimiter)
         if headers is not None:
             writer.writerow(headers)
         writer.writerows(rows)

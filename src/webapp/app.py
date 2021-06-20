@@ -4,26 +4,19 @@
 
 import os
 import sys
-module_path = os.path.abspath(os.path.join('..'))
+
+module_path = os.path.abspath(os.path.join('../..'))
 sys.path.append(module_path)
 
-
 # standard
-import datetime
-import logging
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 
 # custom
-import lib.logger.mylogger
-from webapp.models.ResponseDTO import ResponseDTO
-from lib.knowledgebase.knowledgebase import KnowledgeBase
-import datetime
-# create_kb()
-
-
+from src.lib.logger.mylogger import *
+from src.webapp.models.ResponseDTO import ResponseDTO
+from src.lib.knowledgebase.knowledgebase import KnowledgeBase
 from datetime import datetime
-
 
 # dd/mm/YY H:M:S
 print(datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
@@ -34,18 +27,20 @@ CORS(app)
 
 logging.info(f'Started flask app: {__name__}')
 
+knowledge_base.prove_goal('acted(\"Harry Potter and the Goblet of Fire\",\"Daniel Radcliffe\")')
 
 @app.route('/prove_1_goal', methods=['POST'])
-def prove_1_goal():
+def prove_1_goal() -> Response:
     query = request.json['query']
-    response = knowledge_base.prove_1_goal(query)
-    return jsonify(ResponseDTO(response).to_dict())
+    response: ResponseDTO = knowledge_base.prove_1_goal(query)
+    return jsonify(response.to_dict())
+
 
 @app.route('/prove_goal', methods=['POST'])
-def prove_goal():
+def prove_goal() -> Response:
     query = request.json['query']
-    response = knowledge_base.prove_goal(query)
-    return jsonify(ResponseDTO(response).to_dict())
+    response: ResponseDTO = knowledge_base.prove_goal(query)
+    return jsonify(response.to_dict())
 
 # @app.route('/prove_custom_goal', methods=['POST'])
 # def prove_custom_goal():

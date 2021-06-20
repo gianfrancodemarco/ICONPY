@@ -98,7 +98,7 @@ class WikiMovie:
         statements += self.get_statement("cost")
         statements += self.get_statement("collection")
 
-        #statements = [bytes(statement, 'utf-8').decode('utf-8', 'ignore') for statement in statements]
+        # statements = [bytes(statement, 'utf-8').decode('utf-8', 'ignore') for statement in statements]
 
         return statements
 
@@ -114,24 +114,26 @@ class WikiMovie:
         value = self.props[key] if type(self.props[key]) == list else [self.props[key]]
         statements = []
 
-
         for statement in value:
             val = statement["value"].replace('"', "'")
             statements.append(f'{label}("{title}", "{val}")')
 
         return statements
 
-    def get_csv_representation(self, delimiter =";"):
+    def get_csv_representation(self, delimiter=";"):
 
-        csv_representation = ""
+        csv_representation = []
 
         for key in WIKI_MOVIE_PROPS:
             if key in self.props:
                 if type(self.props[key]) == list:
-                    csv_representation += ",".join(self.props[key])
+                    csv_representation.append(",".join(map(lambda x: x['value'], self.props[key])))
                 else:
-                    csv_representation += self.props[key]
-
-            csv_representation += delimiter
+                    if 'value' in self.props[key]:
+                        csv_representation.append(self.props[key]['value'])
+                    else:
+                        csv_representation.append(self.props[key])
+            else:
+                csv_representation.append("?")
 
         return csv_representation

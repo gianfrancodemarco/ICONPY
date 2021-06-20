@@ -1,5 +1,0 @@
-co_acted_rule
-    use co_acted($actor1, $actor2)
-    when
-        knowledge_base.acted($movie, $actor1)
-        knowledge_base.acted($movie, $actor2)

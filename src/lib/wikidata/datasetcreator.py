@@ -124,8 +124,8 @@ def serialize_movies_with_imdb_score():
             result = omdbapi.get_movie(id).json()
 
             movie.set_prop("metascore", result["Metascore"])
-            movie.set_prop("imdbRating", result["imdbRating"])
-            movie.set_prop("imdbVotes", result["imdbVotes"])
+            movie.set_prop("imdbrating", result["imdbRating"])
+            movie.set_prop("imdbvotes", result["imdbVotes"])
 
         movie.build()
         serialize(movie, PATH_SERIALIZED_IMDB + file)
@@ -139,7 +139,7 @@ def create_full_csv():
         movie = deserialize(PATH_SERIALIZED_IMDB + filename)
         lines.append(movie.get_csv_representation())
 
-    writeCSV(FULL_CSV_PATH, lines, WIKI_MOVIE_PROPS)
+    writeCSV(FULL_CSV_PATH, lines, WIKI_MOVIE_PROPS, encoding="utf-8", delimiter=";")
 
 
 def create_kb():
