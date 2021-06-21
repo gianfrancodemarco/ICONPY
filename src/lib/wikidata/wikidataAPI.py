@@ -1,3 +1,4 @@
+import logging
 import time
 
 import requests
@@ -6,55 +7,45 @@ STD_ENDPOINT = "https://query.wikidata.org/sparql"
 HEADERS = {"User-Agent": "icon-bot/1.0"}
 
 
-class WikiDataAPI:
+def do_query(params):
 
-    def __init__(self, endpoint=STD_ENDPOINT, debug=False):
-        self.endpoint = endpoint
-        self.debug = debug
+    if params['query'] is None:
+        raise Exception("Query param is mandatory")
 
-    def do_query(self, params):
+    logging.debug(f'Quering {STD_ENDPOINT} at {time.ctime(time.time())}')
+    logging.debug(f'Query: {params["query"]}')
 
-        if params['query'] is None:
-            raise Exception("Query param is mandatory")
+    start = time.time()
+    result = requests.get(STD_ENDPOINT, params, headers=HEADERS)
+    end = time.time()
+    logging.debug(f'Elapsed: {end - start}s')
 
-        self._log(f'Quering {self.endpoint} at {time.ctime(time.time())}')
-        self._log(f'Query: {params["query"]}')
+    try:
+        parsed = result.json()
+    except Exception:
+        print('Error in request')
+        print(result.content)
+        return
 
-        start = time.time()
-        result = requests.get(self.endpoint, params, headers=HEADERS)
-        end = time.time()
-        self._log(f'Elapsed: {end - start}s')
+    parsed = parsed['results']['bindings']
+    return parsed
 
-        try:
-            parsed = result.json()
-        except Exception:
-            print('Error in request')
-            print(result.content)
-            return
 
-        parsed = parsed['results']['bindings']
-        return parsed
+def get_resource(uri):
+    logging.debug(f'Quering {uri}')
 
-    def get_resource(self, uri):
+    start = time.time()
+    result = requests.get(STD_ENDPOINT, {"format": "json"}, headers=HEADERS)
+    end = time.time()
+    logging.debug(f'Elapsed: {end - start}s')
 
-        self._log(f'Quering {uri}')
+    try:
+        parsed = result.json()
+    except Exception as e:
+        logging.error('Error in request')
+        logging.error(e)
+        logging.error(result.content)
+        return
 
-        start = time.time()
-        result = requests.get(self.endpoint, {"format": "json"}, headers=HEADERS)
-        end = time.time()
-        self._log(f'Elapsed: {end - start}s')
-
-        try:
-            parsed = result.json()
-        except Exception as e:
-            print('Error in request')
-            print(e)
-            print(result.content)
-            return
-
-        parsed = parsed['results']['bindings']
-        return parsed
-
-    def _log(self, log):
-        if self.debug:
-            print(log)
+    parsed = parsed['results']['bindings']
+    return parsed

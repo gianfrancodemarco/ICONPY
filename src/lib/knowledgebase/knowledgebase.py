@@ -1,18 +1,21 @@
+import os.path
+
 from pyke import knowledge_engine
 import logging
 
 from pyke.knowledge_engine import CanNotProve
 
+from src import ROOT_DIR
 from src.webapp.models.ResponseDTO import ResponseDTO, ResponseTypeEnum
 
-DEFAULT_SOURCE_PATH = "../resources/data/kb/"
+SOURCE_PATH = os.path.join(ROOT_DIR, "src/resources/data/")
 KB_NAME = "knowledge_base"
 RB_NAME = "rules_base"
 
 
 class KnowledgeBase:
 
-    def __init__(self, source_path=DEFAULT_SOURCE_PATH):
+    def __init__(self, source_path=SOURCE_PATH):
         self.engine = knowledge_engine.engine(source_path)
         self.engine.activate(RB_NAME)
         logging.info("Started knowledge base engine")

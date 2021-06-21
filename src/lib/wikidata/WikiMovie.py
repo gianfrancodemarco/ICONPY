@@ -1,6 +1,6 @@
 import pickle
 
-from src.lib.utils.utils import clean_string
+from src.lib.utils.utils import clear_string
 
 WIKI_MOVIE_PROPS = [
     "wiki_data_id", "title", "main_subject", "follows", "genre", "performer", "country_of_origin",
@@ -62,11 +62,11 @@ class WikiMovie:
     def set_prop(self, name, value):
         self.props[name] = value
 
-    def serialize(self):
+    def serialize(self, path):
         filename = self.props["wiki_data_id"] + "_" + self.props["title"]["value"]
-        filename = clean_string(filename)
+        filename = clear_string(filename)
 
-        with open(f'data/serialized_movies/{filename}', 'wb') as f:
+        with open(f'{path}/{filename}', 'wb') as f:
             pickle.dump(self, f)
 
     def get_statements(self):

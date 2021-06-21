@@ -1,4 +1,18 @@
 import pickle
+import src
+
+
+class RenameUnpickler(pickle.Unpickler):
+    def find_class(self, module, name):
+        renamed_module = module
+        if module == "lib.wikidata.wikimovie":
+            renamed_module = "src.lib.wikidata.WikiMovie"
+
+        return super(RenameUnpickler, self).find_class(renamed_module, name)
+
+
+def renamed_load(file_obj):
+    return RenameUnpickler(file_obj).load()
 
 
 def serialize_objects(objects, filename):
@@ -15,7 +29,7 @@ def serialize(obj, filename):
 
 def deserialize(filename):
     with open(filename, 'rb') as f:
-        return pickle.load(f)
+        return renamed_load(f)
 
 
 def deserialize_objects(filename):

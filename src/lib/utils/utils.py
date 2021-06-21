@@ -1,9 +1,39 @@
+import csv
 from os import listdir
 from os.path import isfile, join
-from .csvutils import readCSVtoObj
+from zipfile import ZipFile
 
 
-def clean_string(filename, replacer='', extend_invalid=None):
+def all_files_in_path(path):
+    return [f for f in listdir(path) if isfile(join(path, f))]
+
+
+def writeCSV(filename, rows, headers=None, mode='w') -> None:
+    """
+  Writes a csv file at {filename}
+  Writes headers as the first row, then writes headers
+  """
+
+    with open(filename, mode, newline='', encoding='utf-8') as csvfile:
+        writer = csv.writer(csvfile, delimiter=',')
+        if headers is not None:
+            writer.writerow(headers)
+        writer.writerows(rows)
+
+
+def readCSVtoListOfDict(filename):
+    """
+    Reads csv file at {filename}
+    :returns A list of dicts. The keys are the header of the csv
+    """
+
+    with open(filename, encoding='utf-8') as f:
+        data = [row for row in csv.DictReader(f, skipinitialspace=True)]
+
+    return data
+
+
+def clear_string(filename, replacer='', extend_invalid=None):
 
     invalid = '<>:"/\|?* '
 
@@ -16,16 +46,12 @@ def clean_string(filename, replacer='', extend_invalid=None):
     return filename
 
 
-def all_files_in_path(path):
-    return [f for f in listdir(path) if isfile(join(path, f))]
+def create_zip_file(filename, source_path, source_files):
 
+    # create a ZipFile object
+    with ZipFile(filename, 'w') as zipObj:
 
-def get_skipped_movies_ids():
-    path = 'data/serialized_movies_full'
+        # Add multiple files to the zip
+        for file in source_files:
+            zipObj.write(f'{source_path}/{file}', file)
 
-    fetched_movies_ids = [filename.split('_')[0] for filename in all_files_in_path(path)]
-    all_movies_ids = [movie["uri"].split("/")[-1] for movie in
-                      readCSVtoObj("data/_old_dataset_with_uris.csv", ["_", "_", "uri"])]
-
-    skipped_ids = [idx for idx in all_movies_ids if idx not in fetched_movies_ids]
-    return skipped_ids

@@ -1,0 +1,12 @@
+co_acted
+    use co_acted($actor1, $actor2)
+    when
+        knowledge_base.acted($movie, $actor1)
+        knowledge_base.acted($movie, $actor2)
+        check $actor1 != $actor2
+
+success
+    use success($movie1)
+    when
+        knowledge_base.box_office($movie1, $profit1)
+        check int(float($profit1)) > 200000000
